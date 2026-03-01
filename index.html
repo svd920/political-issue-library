@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Political Issue Library</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #1a1f2e;
+      --surface-color: #252b3d;
+      --text-color: #e8e6e3;
+      --primary-action: #c9a227;
+      --secondary-action: #6b8cae;
+    }
+    
+    .category-btn.active {
+      background: var(--primary-action) !important;
+      color: var(--bg-color) !important;
+    }
+    
+    .issue-card {
+      transition: all 0.3s ease;
+      animation: fadeIn 0.4s ease-out;
+    }
+    
+    .issue-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .source-link {
+      transition: all 0.2s ease;
+    }
+    
+    .source-link:hover {
+      background: var(--primary-action);
+      color: var(--bg-color);
+    }
+    
+    .hero-pattern {
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(107, 140, 174, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg-color) 0%, #0f1219 100%);
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: var(--secondary-action);
+      border-radius: 3px;
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full" style="background: var(--bg-color); color: var(--text-color); font-family: 'Source Sans 3', sans-serif;">
+  <div id="app-wrapper" class="h-full w-full overflow-auto scrollbar-thin hero-pattern">
+   <div class="max-w-6xl mx-auto px-4 py-8"><!-- Header -->
+    <header class="text-center mb-10">
+     <div class="inline-flex items-center gap-3 mb-4">
+      <svg class="w-10 h-10" style="color: var(--primary-action);" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      <h1 id="library-title" class="text-4xl md:text-5xl font-bold" style="font-family: 'Crimson Pro', serif; color: var(--text-color);">Political Issue Library</h1>
+     </div>
+     <p id="subtitle-text" class="text-lg opacity-80 max-w-2xl mx-auto" style="color: var(--secondary-action);">Navigate key political topics with links to reliable, nonpartisan sources</p>
+    </header><!-- Category Navigation -->
+    <nav class="flex flex-wrap justify-center gap-2 mb-8" role="navigation" aria-label="Issue categories"><button class="category-btn active px-5 py-2.5 rounded-full text-sm font-semibold transition-all" style="background: var(--surface-color); color: var(--text-color);" data-category="all"> All Issues </button> <button class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all" style="background: var(--surface-color); color: var(--text-color);" data-category="economy"> 💰 Economy </button> <button class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all" style="background: var(--surface-color); color: var(--text-color);" data-category="healthcare"> 🏥 Healthcare </button> <button class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all" style="background: var(--surface-color); color: var(--text-color);" data-category="environment"> 🌍 Environment </button> <button class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all" style="background: var(--surface-color); color: var(--text-color);" data-category="rights"> ⚖️ Civil Rights </button> <button class="category-btn px-5 py-2.5 rounded-full text-sm font-semibold transition-all" style="background: var(--surface-color); color: var(--text-color);" data-category="foreign"> 🌐 Foreign Policy </button>
+    </nav><!-- Search Bar -->
+    <div class="max-w-md mx-auto mb-10">
+     <div class="relative">
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg><input type="text" id="search-input" placeholder="Search issues..." class="w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:outline-none transition-all" style="background: var(--surface-color); border-color: transparent; color: var(--text-color);" onfocus="this.style.borderColor='var(--primary-action)'" onblur="this.style.borderColor='transparent'">
+     </div>
+    </div><!-- Issues Grid -->
+    <main id="issues-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="main"><!-- Cards populated by JavaScript -->
+    </main><!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-16">
+     <svg class="w-16 h-16 mx-auto mb-4 opacity-40" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+     </svg>
+     <p class="text-lg opacity-60">No issues found matching your search</p>
+    </div><!-- Footer -->
+    <footer class="mt-16 pt-8 border-t text-center" style="border-color: var(--surface-color);">
+     <p class="text-sm opacity-60 mb-2">Sources include nonpartisan research organizations</p>
+     <div class="flex flex-wrap justify-center gap-4 text-xs opacity-50"><span>Pew Research</span> <span>•</span> <span>Brookings Institution</span> <span>•</span> <span>Council on Foreign Relations</span> <span>•</span> <span>KFF</span>
+     </div>
+    </footer>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      library_title: "Political Issue Library",
+      subtitle_text: "Navigate key political topics with links to reliable, nonpartisan sources",
+      background_color: "#1a1f2e",
+      surface_color: "#252b3d",
+      text_color: "#e8e6e3",
+      primary_action: "#c9a227",
+      secondary_action: "#6b8cae",
+      font_family: "Crimson Pro",
+      font_size: 16
+    };
+
+    const issues = [
+      {
+        id: 1,
+        category: "economy",
+        emoji: "💰",
+        title: "Income Inequality",
+        description: "The growing gap between wealthy and low-income Americans, including wages, wealth distribution, and economic mobility.",
+        sources: [
+          { name: "Pew Research", url: "https://www.pewresearch.org/topic/economy-work/income-inequality/" },
+          { name: "Brookings", url: "https://www.brookings.edu/topic/income-inequality/" }
+        ]
+      },
+      {
+        id: 2,
+        category: "economy",
+        emoji: "📊",
+        title: "National Debt",
+        description: "Federal budget deficits, national debt levels, and debates over fiscal policy and government spending priorities.",
+        sources: [
+          { name: "CBO", url: "https://www.cbo.gov/topics/budget" },
+          { name: "Peter G. Peterson Foundation", url: "https://www.pgpf.org/national-debt-clock" }
+        ]
+      },
+      {
+        id: 3,
+        category: "healthcare",
+        emoji: "🏥",
+        title: "Healthcare Access",
+        description: "Insurance coverage, healthcare costs, and debates over public vs. private healthcare systems.",
+        sources: [
+          { name: "KFF", url: "https://www.kff.org/health-reform/" },
+          { name: "Commonwealth Fund", url: "https://www.commonwealthfund.org/health-reform" }
+        ]
+      },
+      {
+        id: 4,
+        category: "healthcare",
+        emoji: "💊",
+        title: "Drug Pricing",
+        description: "Pharmaceutical costs, prescription drug pricing policies, and access to affordable medications.",
+        sources: [
+          { name: "KFF Drug Costs", url: "https://www.kff.org/health-costs/issue-brief/what-we-know-about-prescription-drug-spending/" },
+          { name: "RAND", url: "https://www.rand.org/topics/pharmaceutical-pricing.html" }
+        ]
+      },
+      {
+        id: 5,
+        category: "environment",
+        emoji: "🌡️",
+        title: "Climate Change",
+        description: "Global warming science, emissions policies, renewable energy, and international climate agreements.",
+        sources: [
+          { name: "NASA Climate", url: "https://climate.nasa.gov/" },
+          { name: "IPCC", url: "https://www.ipcc.ch/" }
+        ]
+      },
+      {
+        id: 6,
+        category: "environment",
+        emoji: "⚡",
+        title: "Energy Policy",
+        description: "Fossil fuels vs. renewables, energy independence, infrastructure, and transition policies.",
+        sources: [
+          { name: "EIA", url: "https://www.eia.gov/" },
+          { name: "Resources for the Future", url: "https://www.rff.org/topics/energy/" }
+        ]
+      },
+      {
+        id: 7,
+        category: "rights",
+        emoji: "🗳️",
+        title: "Voting Rights",
+        description: "Election access, voter ID laws, gerrymandering, and election security measures.",
+        sources: [
+          { name: "Brennan Center", url: "https://www.brennancenter.org/issues/ensure-every-american-can-vote" },
+          { name: "MIT Election Lab", url: "https://electionlab.mit.edu/" }
+        ]
+      },
+      {
+        id: 8,
+        category: "rights",
+        emoji: "👥",
+        title: "Immigration Policy",
+        description: "Border security, legal immigration pathways, refugee policy, and citizenship requirements.",
+        sources: [
+          { name: "Migration Policy Institute", url: "https://www.migrationpolicy.org/" },
+          { name: "Pew Immigration", url: "https://www.pewresearch.org/topic/immigration-migration/" }
+        ]
+      },
+      {
+        id: 9,
+        category: "rights",
+        emoji: "🔫",
+        title: "Gun Policy",
+        description: "Second Amendment rights, background checks, assault weapons, and gun violence prevention.",
+        sources: [
+          { name: "RAND Gun Policy", url: "https://www.rand.org/research/gun-policy.html" },
+          { name: "Giffords Law Center", url: "https://giffords.org/lawcenter/" }
+        ]
+      },
+      {
+        id: 10,
+        category: "foreign",
+        emoji: "🌐",
+        title: "U.S.-China Relations",
+        description: "Trade policy, technology competition, security concerns, and diplomatic relations with China.",
+        sources: [
+          { name: "CFR China", url: "https://www.cfr.org/china" },
+          { name: "Brookings China", url: "https://www.brookings.edu/topic/china/" }
+        ]
+      },
+      {
+        id: 11,
+        category: "foreign",
+        emoji: "🛡️",
+        title: "Defense Spending",
+        description: "Military budget, defense priorities, NATO commitments, and global security strategy.",
+        sources: [
+          { name: "CSIS Defense", url: "https://www.csis.org/topics/defense-and-security" },
+          { name: "DoD Budget", url: "https://comptroller.defense.gov/Budget-Materials/" }
+        ]
+      },
+      {
+        id: 12,
+        category: "economy",
+        emoji: "🎓",
+        title: "Student Debt",
+        description: "College affordability, student loan policies, debt forgiveness, and higher education funding.",
+        sources: [
+          { name: "Brookings Education", url: "https://www.brookings.edu/topic/student-loans-and-debt/" },
+          { name: "Federal Reserve", url: "https://www.federalreserve.gov/publications/2023-economic-well-being-of-us-households-in-2022-student-loans.htm" }
+        ]
+      }
+    ];
+
+    let currentCategory = "all";
+    let searchTerm = "";
+
+    function createIssueCard(issue) {
+      return `
+        <article class="issue-card rounded-2xl p-6 flex flex-col" style="background: var(--surface-color);">
+          <div class="flex items-start justify-between mb-3">
+            <span class="text-3xl">${issue.emoji}</span>
+            <span class="text-xs px-3 py-1 rounded-full font-medium capitalize" 
+                  style="background: var(--bg-color); color: var(--secondary-action);">
+              ${issue.category}
+            </span>
+          </div>
+          <h2 class="text-xl font-bold mb-2" style="font-family: 'Crimson Pro', serif; color: var(--text-color);">
+            ${issue.title}
+          </h2>
+          <p class="text-sm leading-relaxed mb-4 flex-grow opacity-80">
+            ${issue.description}
+          </p>
+          <div class="space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Reliable Sources</p>
+            <div class="flex flex-wrap gap-2">
+              ${issue.sources.map(source => `
+                <a href="${source.url}" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="source-link text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1"
+                   style="background: var(--bg-color); color: var(--secondary-action);">
+                  ${source.name}
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function filterIssues() {
+      let filtered = issues;
+      
+      if (currentCategory !== "all") {
+        filtered = filtered.filter(issue => issue.category === currentCategory);
+      }
+      
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(issue => 
+          issue.title.toLowerCase().includes(term) ||
+          issue.description.toLowerCase().includes(term) ||
+          issue.category.toLowerCase().includes(term)
+        );
+      }
+      
+      return filtered;
+    }
+
+    function renderIssues() {
+      const grid = document.getElementById("issues-grid");
+      const emptyState = document.getElementById("empty-state");
+      const filtered = filterIssues();
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = "";
+        emptyState.classList.remove("hidden");
+      } else {
+        emptyState.classList.add("hidden");
+        grid.innerHTML = filtered.map(createIssueCard).join("");
+      }
+    }
+
+    // Category button handlers
+    document.querySelectorAll(".category-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = btn.dataset.category;
+        renderIssues();
+      });
+    });
+
+    // Search handler
+    document.getElementById("search-input").addEventListener("input", (e) => {
+      searchTerm = e.target.value;
+      renderIssues();
+    });
+
+    // Element SDK initialization
+    async function onConfigChange(config) {
+      const root = document.documentElement;
+      root.style.setProperty('--bg-color', config.background_color || defaultConfig.background_color);
+      root.style.setProperty('--surface-color', config.surface_color || defaultConfig.surface_color);
+      root.style.setProperty('--text-color', config.text_color || defaultConfig.text_color);
+      root.style.setProperty('--primary-action', config.primary_action || defaultConfig.primary_action);
+      root.style.setProperty('--secondary-action', config.secondary_action || defaultConfig.secondary_action);
+
+      const title = document.getElementById("library-title");
+      const subtitle = document.getElementById("subtitle-text");
+      
+      title.textContent = config.library_title || defaultConfig.library_title;
+      subtitle.textContent = config.subtitle_text || defaultConfig.subtitle_text;
+
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      title.style.fontFamily = `'${fontFamily}', 'Crimson Pro', serif`;
+      
+      const fontSize = config.font_size || defaultConfig.font_size;
+      document.body.style.fontSize = `${fontSize}px`;
+      title.style.fontSize = `${fontSize * 2.5}px`;
+      subtitle.style.fontSize = `${fontSize * 1.1}px`;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => { config.surface_color = value; window.elementSdk.setConfig({ surface_color: value }); }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => { config.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => { config.primary_action = value; window.elementSdk.setConfig({ primary_action: value }); }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => { config.secondary_action = value; window.elementSdk.setConfig({ secondary_action: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => { config.font_family = value; window.elementSdk.setConfig({ font_family: value }); }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => { config.font_size = value; window.elementSdk.setConfig({ font_size: value }); }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["library_title", config.library_title || defaultConfig.library_title],
+        ["subtitle_text", config.subtitle_text || defaultConfig.subtitle_text]
+      ]);
+    }
+
+    // Initialize
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    renderIssues();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d2d606b005915b8',t:'MTc3MTkxOTQ3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
